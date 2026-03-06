@@ -14,6 +14,7 @@ import games.strategy.triplea.delegate.TechTracker;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -207,11 +208,7 @@ class TechnologyPanel extends JPanel implements GameDataChangeListener {
 
     private void initColList() {
       final List<GamePlayer> players = gameData.getPlayerList().getPlayers();
-      colList =
-          players.stream()
-              .map(GamePlayer::getName)
-              .filter(name -> uiContext == null || uiContext.getMapData().shouldShowInTech(name))
-              .toArray(String[]::new);
+      colList = players.stream().map(GamePlayer::getName).toArray(String[]::new);
       Arrays.sort(colList);
     }
 
@@ -222,7 +219,9 @@ class TechnologyPanel extends JPanel implements GameDataChangeListener {
       try (GameData.Unlocker ignored = gameDataSync.acquireReadLock()) {
         for (final GamePlayer playerID : gameDataSync.getPlayerList().getPlayers()) {
           if (colMap.get(playerID.getName()) == null) {
-            continue;
+            throw new IllegalStateException(
+                MessageFormat.format(
+                    "Unexpected player in GameData.getPlayerList(): {0}", playerID.getName()));
           }
           final int col = colMap.get(playerID.getName());
           int row = 0;

@@ -88,7 +88,7 @@ public class PlayerTypes {
     @Getter(AccessLevel.PACKAGE)
     private final boolean visible;
 
-    protected Type(final String label) {
+    public Type(final String label) {
       this(label, true);
     }
 
