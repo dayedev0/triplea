@@ -21,13 +21,10 @@ public class BattleRecordsList extends GameDataComponent {
       final Map<Integer, BattleRecords> recordList,
       final int currentRound,
       final BattleRecords other) {
-    final BattleRecords current = recordList.get(currentRound);
-    if (current == null) {
-      recordList.put(currentRound, other);
-      return;
-    }
-    current.addRecord(other);
-    recordList.put(currentRound, current);
+    recordList.merge(currentRound, other, (current, newRecords) -> {
+      current.addRecord(newRecords);
+      return current;
+    });
   }
 
   public static void removeRecords(
