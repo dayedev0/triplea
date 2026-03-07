@@ -155,73 +155,72 @@ public class ChatPlayerPanel extends JPanel implements ChatPlayerListener {
             mouseOnPlayersList(e);
           }
         });
-    final JPanel panelReference = this;
-    actionFactories.add(
-        clickedOn -> {
-          // you can't slap or ignore yourself
-          if (clickedOn.getUserName().equals(chat.getLocalUserName())) {
-            return List.of();
-          }
-          final boolean isIgnored = chat.isIgnored(clickedOn.getUserName());
-          final Action ignore =
-              SwingAction.of(
-                  isIgnored ? "Stop Ignoring" : "Ignore",
-                  e -> {
-                    chat.setIgnored(clickedOn.getUserName(), !isIgnored);
-                    repaint();
-                  });
-          final Action slap =
-              SwingAction.of(
-                  "Slap " + clickedOn.getUserName(), e -> chat.sendSlap(clickedOn.getUserName()));
+    actionFactories.add(this::buildContextMenuActions);
+  }
 
-          // TODO: add check for if we are moderator
-          final Action disconnect =
-              SwingAction.of(
-                  "Disconnect " + clickedOn.getUserName(),
-                  e -> {
-                    if (EventThreadJOptionPane.showConfirmDialog(
-                        panelReference,
-                        "Disconnect " + clickedOn.getUserName() + "?",
-                        "Confirm Disconnect",
-                        EventThreadJOptionPane.ConfirmDialogType.YES_NO)) {
-                      chat.getMessengers()
-                          .sendToServer(
-                              ModeratorMessage.newDisconnect(clickedOn.getUserName().getValue()));
-                    }
-                  });
-          // TODO: add check for if we are moderator
+  private List<Action> buildContextMenuActions(final ChatParticipant clickedOn) {
+    // you can't slap or ignore yourself
+    if (clickedOn.getUserName().equals(chat.getLocalUserName())) {
+      return List.of();
+    }
+    final boolean isIgnored = chat.isIgnored(clickedOn.getUserName());
+    final Action ignore =
+        SwingAction.of(
+            isIgnored ? "Stop Ignoring" : "Ignore",
+            e -> {
+              chat.setIgnored(clickedOn.getUserName(), !isIgnored);
+              repaint();
+            });
+    final Action slap =
+        SwingAction.of(
+            "Slap " + clickedOn.getUserName(), e -> chat.sendSlap(clickedOn.getUserName()));
 
-          final Action ban =
-              SwingAction.of(
-                  "Ban " + clickedOn.getUserName(),
-                  e -> {
-                    if (EventThreadJOptionPane.showConfirmDialog(
-                        panelReference,
-                        "Ban " + clickedOn.getUserName() + "?",
-                        "Confirm Ban",
-                        EventThreadJOptionPane.ConfirmDialogType.YES_NO)) {
-                      chat.getMessengers()
-                          .sendToServer(
-                              ModeratorMessage.newBan(clickedOn.getUserName().getValue()));
-                    }
-                  });
+    // TODO: add check for if we are moderator
+    final Action disconnect =
+        SwingAction.of(
+            "Disconnect " + clickedOn.getUserName(),
+            e -> {
+              if (EventThreadJOptionPane.showConfirmDialog(
+                  this,
+                  "Disconnect " + clickedOn.getUserName() + "?",
+                  "Confirm Disconnect",
+                  EventThreadJOptionPane.ConfirmDialogType.YES_NO)) {
+                chat.getMessengers()
+                    .sendToServer(
+                        ModeratorMessage.newDisconnect(clickedOn.getUserName().getValue()));
+              }
+            });
+    // TODO: add check for if we are moderator
 
-          List<Action> availableActions = new ArrayList<>(List.of(slap, ignore));
+    final Action ban =
+        SwingAction.of(
+            "Ban " + clickedOn.getUserName(),
+            e -> {
+              if (EventThreadJOptionPane.showConfirmDialog(
+                  this,
+                  "Ban " + clickedOn.getUserName() + "?",
+                  "Confirm Ban",
+                  EventThreadJOptionPane.ConfirmDialogType.YES_NO)) {
+                chat.getMessengers()
+                    .sendToServer(ModeratorMessage.newBan(clickedOn.getUserName().getValue()));
+              }
+            });
 
-          boolean currentPlayerIsModerator = false;
-          for (int i = 0, n = listModel.getSize(); i < n; i++) {
-            var participant = listModel.get(i);
-            if (chat.getLocalUserName().equals(participant.getUserName())) {
-              currentPlayerIsModerator = participant.isModerator();
-              break;
-            }
-          }
+    List<Action> availableActions = new ArrayList<>(List.of(slap, ignore));
 
-          if (currentPlayerIsModerator && !clickedOn.isModerator()) {
-            availableActions.addAll(List.of(disconnect, ban));
-          }
-          return availableActions;
-        });
+    boolean currentPlayerIsModerator = false;
+    for (int i = 0, n = listModel.getSize(); i < n; i++) {
+      var participant = listModel.get(i);
+      if (chat.getLocalUserName().equals(participant.getUserName())) {
+        currentPlayerIsModerator = participant.isModerator();
+        break;
+      }
+    }
+
+    if (currentPlayerIsModerator && !clickedOn.isModerator()) {
+      availableActions.addAll(List.of(disconnect, ban));
+    }
+    return availableActions;
   }
 
   /** The renderer will be passed in a string. */
