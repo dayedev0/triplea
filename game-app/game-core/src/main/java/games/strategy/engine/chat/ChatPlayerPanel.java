@@ -201,8 +201,7 @@ public class ChatPlayerPanel extends JPanel implements ChatPlayerListener {
               "Confirm Disconnect",
               EventThreadJOptionPane.ConfirmDialogType.YES_NO)) {
             chat.getMessengers()
-                .sendToServer(
-                    ModeratorMessage.newDisconnect(clickedOn.getUserName().getValue()));
+                .sendToServer(ModeratorMessage.newDisconnect(clickedOn.getUserName().getValue()));
           }
         });
   }

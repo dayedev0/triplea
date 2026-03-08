@@ -10,7 +10,6 @@ public class RepairRules extends GameDataComponent {
 
   private final Map<String, RepairRule> fixRules = new HashMap<>();
 
-
   public RepairRules(final GameData data) {
     super(data);
   }

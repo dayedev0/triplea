@@ -68,19 +68,18 @@ public class UnitsDrawer extends AbstractDrawable {
 
     final GamePlayer owner = unitCategory.getOwner();
     final boolean damagedImage =
-            unitCategory.getDamaged() > 0 || unitCategory.getBombingDamage() > 0;
+        unitCategory.getDamaged() > 0 || unitCategory.getBombingDamage() > 0;
     final UnitType unitType = unitCategory.getType();
 
     final var imageKey =
-            ImageKey.builder()
-                    .type(unitType)
-                    .player(owner)
-                    .damaged(damagedImage)
-                    .disabled(unitCategory.getDisabled())
-                    .build();
+        ImageKey.builder()
+            .type(unitType)
+            .player(owner)
+            .damaged(damagedImage)
+            .disabled(unitCategory.getDisabled())
+            .build();
 
     final Image img = factory.getImage(imageKey);
-
 
     int width = img.getWidth(null);
     int height = img.getHeight(null);
